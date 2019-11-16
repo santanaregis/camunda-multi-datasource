@@ -1,0 +1,45 @@
+version: '3.3'
+
+services:
+  mysql-docker:
+    image: mysql:5.6
+    restart: always
+    container_name: "mysql-app"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: process-engine
+      MYSQL_USER: camunda
+      MYSQL_PASSWORD: camunda
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - mysql-docker-data:/teste/lib/mysql/data
+
+  mongo-docker:
+    image: mongo
+    container_name: "mongo-app"
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-docker-data:/var/lib/mongo/data
+
+  example-app:
+    image: example-image
+    ports:
+      - 8080:8080
+    expose:
+      - '8080'
+    depends_on:
+      - mysql-docker
+      - mongo-docker
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - /data/spring-boot-app
+
+volumes:
+  mysql-docker-data:
+  mongo-docker-data:
